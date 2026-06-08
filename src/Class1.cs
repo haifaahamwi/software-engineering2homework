@@ -1,36 +1,41 @@
 ﻿using System;
 
-namespace MathLibrary
+namespace UnitTestingDemo
 {
-    public class BillingService
+    public class Class1
     {
-        public double CalculateBill(string patientType, string paymentMethod, double amount, bool insuranceApproved)
+        // التابع الرئيسي بعد التعديل (أصبح تعقيده الدوري منخفض جداً ويساوي 2)
+        public string EvaluateStudentGrade(double score, bool isLate, bool hasDiscountCode)
         {
-            if (amount <= 0)
-                throw new ArgumentException("Amount must be positive");
+            if (IsInvalidScore(score)) return "Invalid Score";
 
-            // 1. حساب التسعير بناءً على نوع المريض (تطبيق الشروط)
-            double multiplier;
-            if (patientType == "VIP") multiplier = 0.8;
-            else if (patientType == "Regular") multiplier = 1.0;
-            else if (patientType == "Emergency") multiplier = 1.2;
-            else throw new ArgumentException("Invalid patient type");
+            score = ApplyLatePenalty(score, isLate);
 
-            double afterDiscount = amount * multiplier;
+            return GetFinalGrade(score, hasDiscountCode);
+        }
 
-            // 2. التحقق من حالة الدفع والتغطية التأمينية
-            if (paymentMethod == "Insurance")
+        // تابع مساعد فرعي 1: للتحقق من صحة الدرجة المدخلة
+        private bool IsInvalidScore(double score)
+        {
+            return score < 0 || score > 100;
+        }
+
+        // تابع مساعد فرعي 2: لتطبيق حسم التأخير
+        private double ApplyLatePenalty(double score, bool isLate)
+        {
+            if (!isLate) return score;
+            double newScore = score - 10;
+            return newScore < 0 ? 0 : newScore;
+        }
+
+        // تابع مساعد فرعي 3: لتحديد النتيجة النهائية والخصم
+        private string GetFinalGrade(double score, bool hasDiscountCode)
+        {
+            if (score >= 90)
             {
-                if (!insuranceApproved)
-                    throw new InvalidOperationException("Insurance not approved");
-                return afterDiscount * 0.5; // تغطية جزئية
+                return hasDiscountCode ? "A+ with Discount" : "A+";
             }
-            else if (paymentMethod == "Cash")
-            {
-                return afterDiscount;
-            }
-
-            throw new ArgumentException("Invalid payment method");
+            return score >= 60 ? "Pass" : "Fail";
         }
     }
 }
